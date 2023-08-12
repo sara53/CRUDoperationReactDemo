@@ -1,26 +1,16 @@
-import axios from 'axios'
+
 import React, { useEffect, useState } from 'react'
 import { Table } from 'react-bootstrap'
 import { NavLink } from 'react-router-dom'
-
+import { getProducts, deleteProduct } from '../API/productAPI'
+import { useGetData } from '../hooks/useGetData'
 export default function Products() {
 
-    let [ products, setProducts ] = useState( [] )
-    const URL = 'http://localhost:3005/products'
-    useEffect( () => {
-
-        const fetchProducts = async () => {
-            let response = await axios.get( URL );
-            setProducts( response.data )
-
-        }
+    const [ products, setProducts ] = useGetData( getProducts );
 
 
-        fetchProducts();
-    }, [] )
-
-    const deleteProduct = async ( id ) => {
-        await axios.delete( `${URL}/${id}` )
+    const deleteProductHandler = async ( id ) => {
+        await deleteProduct( id )
         let newProducts = products.filter( ( product ) => product.id != id );
         setProducts( newProducts )
     }
@@ -40,7 +30,7 @@ export default function Products() {
                     </thead>
                     <tbody>
                         {
-                            products.map( ( product ) => {
+                            products && products.map( ( product ) => {
                                 return (
                                     <tr key={product.id}>
                                         <td>{product.id}</td>
@@ -52,8 +42,10 @@ export default function Products() {
                                                 <i className="fs-2 mx-1 text-warning bar__databi bi-eye-fill"></i>
                                             </NavLink>
 
-                                            <i className="fs-2 mx-1 text-info bar__databi bi-pencil-square"></i>
-                                            <i onClick={() => deleteProduct( product.id )} className="fs-2 mx-1 text-danger bar__databi bi-trash3"></i>
+                                            <NavLink to={`/products/${product.id}/edit`}>
+                                                <i className="fs-2 mx-1 text-info bar__databi bi-pencil-square"></i>
+                                            </NavLink>
+                                            <i onClick={() => deleteProductHandler( product.id )} className="fs-2 mx-1 text-danger bar__databi bi-trash3"></i>
                                         </td>
                                     </tr>
                                 )
